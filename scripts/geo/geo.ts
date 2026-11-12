@@ -3,6 +3,9 @@
  *   npm run geo   → public/geo/br-uf.json e public/geo/mun/<UF>.json
  */
 import { geoArea } from "d3-geo";
+import { feature } from "topojson-client";
+import { topology } from "topojson-server";
+import { presimplify, quantile, simplify } from "topojson-simplify";
 import { join } from "node:path";
 import { writeJson } from "../ingest/writer";
 
@@ -28,10 +31,19 @@ export function roundCoords(ring: Pos[], digits = 3): Pos[] {
   return out;
 }
 
+/** Arredonda um anel; se ele colapsar (ilha minúscula), usa mais casas decimais. */
+function roundRing(r: Pos[], digits: number): Pos[] {
+  for (let d = digits; d <= 6; d++) {
+    const out = roundCoords(r, d);
+    if (out.length >= 4) return out;
+  }
+  return r;
+}
+
 function roundGeometry(g: Geometry, digits: number): Geometry {
-  if (g.type === "Polygon") return { type: g.type, coordinates: (g.coordinates as Pos[][]).map((r) => roundCoords(r, digits)) };
+  if (g.type === "Polygon") return { type: g.type, coordinates: (g.coordinates as Pos[][]).map((r) => roundRing(r, digits)) };
   if (g.type === "MultiPolygon")
-    return { type: g.type, coordinates: (g.coordinates as Pos[][][]).map((p) => p.map((r) => roundCoords(r, digits))) };
+    return { type: g.type, coordinates: (g.coordinates as Pos[][][]).map((p) => p.map((r) => roundRing(r, digits))) };
   return g;
 }
 
@@ -67,6 +79,19 @@ export function normalizeCollection(fc: FC, id: (codarea: string) => string, dig
   };
 }
 
+/**
+ * Simplifica a malha preservando as fronteiras compartilhadas (TopoJSON / Visvalingam).
+ * `manter` = fração dos pontos mais relevantes que permanece.
+ */
+export function simplificar(fc: FC, manter = 0.35): FC {
+  const topo = presimplify(topology({ m: fc as never }) as never);
+  const simples = simplify(topo, quantile(topo, 1 - manter));
+  const out = feature(simples, simples.objects.m as never) as unknown as FC;
+  // áreas minúsculas (ilhas) podem sumir na simplificação: mantém a geometria original
+  out.features = out.features.map((f, i) => (f.geometry ? f : { ...f, geometry: fc.features[i].geometry }));
+  return out;
+}
+
 const API = "https://servicodados.ibge.gov.br/api/v3/malhas";
 const QS = "formato=application/vnd.geo%2Bjson&qualidade=minima";
 
@@ -82,7 +107,7 @@ async function main() {
   await writeJson(join(out, "br-uf.json"), normalizeCollection(br, (c) => IBGE_UF[c]));
   for (const uf of Object.values(IBGE_UF)) {
     const fc = await get(`${API}/estados/${uf}?${QS}&intrarregiao=municipio`);
-    const r = await writeJson(join(out, "mun", `${uf}.json`), normalizeCollection(fc, (c) => c));
+    const r = await writeJson(join(out, "mun", `${uf}.json`), normalizeCollection(simplificar(fc), (c) => c, 2));
     console.log(uf, fc.features.length, "municípios", (r.bytes / 1024).toFixed(0), "KB");
   }
 }

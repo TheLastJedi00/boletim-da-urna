@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { geoArea } from "d3-geo";
-import { IBGE_UF, normalizeCollection, roundCoords } from "./geo";
+import { IBGE_UF, normalizeCollection, roundCoords, simplificar } from "./geo";
 
 describe("geo", () => {
   it("mapeia código IBGE da UF para sigla (27 UFs)", () => {
@@ -41,5 +41,37 @@ describe("geo", () => {
     const fc = { type: "FeatureCollection", features: [{ type: "Feature", properties: { codarea: "12" }, geometry: { type: "Polygon", coordinates: [ccw] } }] };
     const out = normalizeCollection(fc, (c) => IBGE_UF[c]);
     expect(geoArea(out.features[0] as never)).toBeLessThan(0.01);
+  });
+
+  it("simplifica mantendo todas as áreas e reduzindo os pontos", () => {
+    const anel = Array.from({ length: 41 }, (_, i) => {
+      const a = (i / 40) * 2 * Math.PI;
+      return [-50 + Math.cos(a) * (1 + 0.01 * (i % 3)), -10 + Math.sin(a) * (1 + 0.01 * (i % 3))];
+    });
+    anel[40] = anel[0];
+    const fc = { type: "FeatureCollection", features: [{ type: "Feature", properties: { codarea: "1" }, geometry: { type: "Polygon", coordinates: [anel] } }] };
+    const s = simplificar(fc as never, 0.3);
+    expect(s.features).toHaveLength(1);
+    expect((s.features[0].geometry.coordinates as number[][][])[0].length).toBeLessThan(anel.length);
+  });
+
+  it("não perde áreas minúsculas na simplificação (ex.: ilhas)", () => {
+    const quadrado = (x: number, y: number, l: number) => [[x, y], [x + l, y], [x + l, y + l], [x, y + l], [x, y]];
+    const fc = {
+      type: "FeatureCollection",
+      features: [
+        { type: "Feature", properties: { codarea: "1" }, geometry: { type: "Polygon", coordinates: [quadrado(-50, -10, 2)] } },
+        { type: "Feature", properties: { codarea: "2" }, geometry: { type: "Polygon", coordinates: [quadrado(-30, -3, 0.0001)] } },
+      ],
+    };
+    const s = simplificar(fc as never, 0.01);
+    expect(s.features.every((f) => f.geometry)).toBe(true);
+  });
+
+  it("ilha minúscula não colapsa num ponto ao arredondar", () => {
+    const ilha = [[-32.431, -3.851], [-32.428, -3.851], [-32.428, -3.848], [-32.431, -3.848], [-32.431, -3.851]];
+    const fc = { type: "FeatureCollection", features: [{ type: "Feature", properties: { codarea: "x" }, geometry: { type: "Polygon", coordinates: [ilha] } }] };
+    const out = normalizeCollection(fc, (c) => c, 2);
+    expect(out.features[0].geometry.coordinates[0].length).toBeGreaterThanOrEqual(4);
   });
 });

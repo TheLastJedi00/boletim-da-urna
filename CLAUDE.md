@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 "Boletim da Urna" is an interactive **case study** of Brazilian elections. It is meant to teach people how the electoral system works through visuals, not spreadsheets. It:
 
-- Collects data from **boletins de urna** (the user will provide the files) and other official Justiça Eleitoral (TSE) data.
+- Collects data from **boletins de urna** (downloaded automatically from TSE) and other official Justiça Eleitoral data.
 - Cross-references it with news and **vote-intention polls** published before the 1st and 2nd rounds.
 - Shows **projections and margins of error**, comparing what the polls said with the official result.
 - Presents **simulations of hypothetical fraud**: how a fraud would work, what statistical and data signals would reveal it, and how the system's controls catch it. The goal is awareness, not alarmism.
@@ -20,7 +20,7 @@ Content rules:
 
 ## Data sources (2026 presidential election — verified 2026-11-11)
 
-Election: **Presidente 2026**. 1st round 04/10/2026 (`cd_eleicao` 6257), 2nd round 25/10/2026 (6258), pleito 3220, ciclo `ele2026`.
+Election: **Presidente 2026**. 1st round 04/10/2026 (`cd_eleicao` 6257, pleito 3220), 2nd round 25/10/2026 (6258, pleito 3221), ciclo `ele2026`.
 
 1. **Results JSON** (`https://resultados.tse.jus.br/oficial`, the same files the TSE "Resultados" app reads). Not a formal REST API: these are static files and their layout may change.
    - Config/index: `/comum/config/ele-c.json` (path templates + election codes), `/ele2026/<cd_eleicao>/config/mun-e00<cd_eleicao>-cm.json` (municipalities/zones).
@@ -32,18 +32,48 @@ Election: **Presidente 2026**. 1st round 04/10/2026 (`cd_eleicao` 6257), 2nd rou
 2. **Boletim de Urna CSVs** (Portal de Dados Abertos, CKAN API at `https://dadosabertos.tse.jus.br/api/3/action/...`, dataset `resultados-2026-boletim-de-urna`). There is one zip per UF and round, plus a `.sha512` file each: `https://cdn.tse.jus.br/estatistica/sead/eleicoes/eleicoes2026/buweb/bweb_<1t|2t>_<UF>_<timestamp>.zip`. The zips are large (SP 1st round ≈ 1.4 GB, because it holds every cargo) and must be filtered down to Presidente.
 
 Never hit TSE at request time. Ingest through scripts (download → verify SHA-512 → stream/filter → aggregate) into compact snapshots that the app reads. **No database in the MVP.** `npm run ingest` (`scripts/ingest/run.ts`; flags `--uf AC,SP --turno 2`) writes:
-- `data/snapshots/`: aggregates (`resultados.json`, `municipios/<UF>.json`) and `manifest.json`. Committed, and read by server components at build time.
+- `data/snapshots/`: aggregates (`resultados.json`, `municipios/<UF>.json`), `sinais.json` (real-data signals + a 1,000-section sample for the simulator, from `scripts/ingest/stats-hook.ts`) and `manifest.json`. Committed, and read by server components at build time.
 - `public/data/secoes/<turno>/<UF>/<cdMunicipio>.json.gz`: one file per municipality in the columnar format of `lib/section-codec.ts`. Committed and gzipped, about 33 MB in total (about 125 MB uncompressed). The browser fetches one on demand and decompresses it with `DecompressionStream`.
 
 Raw zips are about 5 GB and live in `data/raw/` (gitignored). They never go to the repo or deploy. The ingestion reconciles the sum of the BUs against the official TSE totals. Every UF matches exactly; ZZ (exterior) only differs in section count, because some sections have no BU, and that is reported as an `aviso`. Note: in the CSV the 2nd round has `CD_PLEITO` 3221.
 
 Production domain: **https://tse.lenoborges.com.br**. Visual identity follows lenoborges.com.br. The tokens are listed in `.specs/001 - MVP/context.md`: dark neumorphic theme, accent `#3986ff`, Outfit / DM Sans / JetBrains Mono, Tailwind v4. Candidate chart colors use **subtle party colors**: desaturated and tuned for the dark theme, applied only to data marks and never to UI chrome. A party color that is close to the brand accent gets shifted away from it. All of them are defined in one `party-colors` token map.
 
-## Stack and project state
+## Commands
 
-- **Next.js** (App Router). This one app covers both frontend and backend, using Route Handlers and Server Actions.
-- No code or git history exists yet. Once the app is scaffolded, update this file with its build, lint and test commands and its architecture.
-- Ports: `RULES.md` says the frontend runs on 4200 and the backend on 3000. Since Next.js serves both from one process, run the dev server on **3000** (`next dev`). If you need a different port, change it here and in `RULES.md`.
+```bash
+npm run dev            # dev server on http://localhost:3000
+npm run build          # production build (all pages are static / prerendered)
+npm test               # Vitest (all suites)
+npx vitest run lib/polls/model.test.ts   # one file;  -t "<name>" for one test
+npm run typecheck && npm run lint
+npm run ingest         # TSE → data/snapshots + public/data (needs ~5 GB in data/raw; cached by SHA-512)
+npm run pesquisas      # validate data/curated/*.csv → data/snapshots/pesquisas.json (fails on validation errors)
+npm run geo            # IBGE meshes → public/geo (TopoJSON-simplified, rings oriented for d3-geo)
+```
+
+Next.js 16 with `cacheComponents`. Its APIs differ from older versions, so read `node_modules/next/dist/docs/` before using one (see `AGENTS.md`). After changing many files the dev server can serve stale Tailwind CSS; restart it when utilities seem to be missing.
+
+## Architecture
+
+- **Ingestion is offline, rendering is static.**
+  - `scripts/` is Node only: ingestion, curation, geo.
+  - The scripts write snapshots.
+  - `lib/data/snapshots.ts` and `lib/data/geo.ts` (`server-only`, `"use cache"` + `cacheLife("max")`) read them while pages prerender.
+  - Nothing calls TSE at runtime. The one exception is the links on `/secao`, which point at TSE's official per-section files.
+- **`lib/` is pure, tested logic shared by scripts and UI.**
+  - `section-codec` is the columnar section format.
+  - `signals/*` hold turnout, timing and biometrics signals (robust z = median/MAD, compared within the same UF because of time zones) and Benford.
+  - `simulation/engine` holds hypothetical fraud scenarios. The scenarios must stay **symmetric across candidates**, and tests enforce it.
+  - `polls/*` covers curated CSV validation and the projection model. Valid votes use a margin floored at the SRS theoretical margin.
+  - `party-colors` uses OKLCH with contrast and accent-distance tests.
+- **UI:**
+  - `app/<section>/page.tsx` are server components.
+  - Interactive parts are small client components: the poll timeline, the simulator and the section lookup.
+  - Maps are server-rendered SVG (`app/resultados/_components/choropleth.tsx`). Both rounds' colors go in CSS vars (`--f1/--f2`) and `TurnoProvider`/`MapaTurno` switch between them, so the heavy SVG is emitted once.
+  - Every chart goes through `Figure`, which takes a required `source`. Simulated content uses `SimBadge` / `sim-hatch`.
+- `/api/municipios/[uf]` is a statically generated route handler. `/secao` uses it together with `public/data/secoes/*.json.gz`.
+- Port: everything runs on **3000**. `RULES.md` mentions 4200 for a frontend, but Next.js serves frontend and backend from one process.
 
 ## Spec-driven workflow (from RULES.md — authoritative, read it for the full text)
 

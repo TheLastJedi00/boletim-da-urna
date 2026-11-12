@@ -13,7 +13,7 @@ export function Figure({
   children: React.ReactNode;
 }) {
   return (
-    <figure className={`card p-5 sm:p-6 ${simulated ? "ring-1 ring-sim/50" : ""}`}>
+    <figure className={`card min-w-0 p-5 sm:p-6 ${simulated ? "ring-1 ring-sim/50" : ""}`}>
       <div className="mb-4 flex flex-wrap items-start justify-between gap-2">
         <div>
           <h3 className="text-lg font-medium">{title}</h3>
