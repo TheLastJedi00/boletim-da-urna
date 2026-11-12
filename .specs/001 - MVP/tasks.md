@@ -82,9 +82,9 @@
 
 ## Fase 8 — `feat/pagina-simulacoes`
 
-- [ ] **8.1** Sinais nos dados reais: distribuições, seções fora do padrão e a explicação de que outlier não é prova.
-- [ ] **8.2** Simulador interativo: escolher o cenário e a intensidade e ver como a fraude seria feita, que sinal aparece e qual controle detecta. Tudo com o estilo "Simulação hipotética".
-- [ ] **8.3** Bloco "Por que Benford não serve para eleições".
+- [x] **8.1** Sinais nos dados reais: distribuições, seções fora do padrão e a explicação de que outlier não é prova.
+- [x] **8.2** Simulador interativo: escolher o cenário e a intensidade e ver como a fraude seria feita, que sinal aparece e qual controle detecta. Tudo com o estilo "Simulação hipotética".
+- [x] **8.3** Bloco "Por que Benford não serve para eleições".
 
 ## Fase 9 — `feat/pagina-secao`
 
