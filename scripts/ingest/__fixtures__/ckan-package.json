@@ -1,0 +1,56 @@
+{
+ "success": true,
+ "result": {
+  "name": "resultados-2026-boletim-de-urna",
+  "resources": [
+   {
+    "id": "d12f4e2a-4bd8-45e3-a596-34f659362f50",
+    "name": "AC - Boletim de Urna - Primeiro turno - 05.10.2026",
+    "url": "https://cdn.tse.jus.br/estatistica/sead/eleicoes/eleicoes2026/buweb/bweb_1t_AC_051020261403.zip",
+    "format": "CSV"
+   },
+   {
+    "id": "1a40c823-f89f-4b67-8818-8ac3f32864c2",
+    "name": "AC - Hash SHA2 - Primeiro turno - 05.10.2026",
+    "url": "https://cdn.tse.jus.br/estatistica/sead/eleicoes/eleicoes2026/buweb/bweb_1t_AC_051020261403.zip.sha512",
+    "format": ""
+   },
+   {
+    "id": "4753eb99-062b-484a-b569-04c51d039885",
+    "name": "AC - Boletim de Urna - Segundo turno - 26.10.2026",
+    "url": "https://cdn.tse.jus.br/estatistica/sead/eleicoes/eleicoes2026/buweb/bweb_2t_AC_261020260742.zip",
+    "format": "CSV"
+   },
+   {
+    "id": "0978b3fe-28cb-4dae-a1e4-848e70942b8e",
+    "name": "AC - Hash SHA2 - Segundo turno - 26.10.2026",
+    "url": "https://cdn.tse.jus.br/estatistica/sead/eleicoes/eleicoes2026/buweb/bweb_2t_AC_261020260742.zip.sha512",
+    "format": ""
+   },
+   {
+    "id": "cf27bba1-3ee0-4952-ad36-3be435799623",
+    "name": "SP - Boletim de Urna - Primeiro turno - 05.10.2026",
+    "url": "https://cdn.tse.jus.br/estatistica/sead/eleicoes/eleicoes2026/buweb/bweb_1t_SP_051020261403.zip",
+    "format": "CSV"
+   },
+   {
+    "id": "0132cfbf-4665-491f-acdc-865c0a612800",
+    "name": "SP - Hash SHA2 - Primeiro turno - 05.10.2026",
+    "url": "https://cdn.tse.jus.br/estatistica/sead/eleicoes/eleicoes2026/buweb/bweb_1t_SP_051020261403.zip.sha512",
+    "format": ""
+   },
+   {
+    "id": "f6205a0c-a6af-4e94-abad-f82488590efb",
+    "name": "SP - Boletim de Urna - Segundo turno - 26.10.2026",
+    "url": "https://cdn.tse.jus.br/estatistica/sead/eleicoes/eleicoes2026/buweb/bweb_2t_SP_261020260742.zip",
+    "format": "CSV"
+   },
+   {
+    "id": "22bfac6c-ca6c-42db-9be9-923b6b81bae1",
+    "name": "SP - Hash SHA2 - Segundo turno - 26.10.2026",
+    "url": "https://cdn.tse.jus.br/estatistica/sead/eleicoes/eleicoes2026/buweb/bweb_2t_SP_261020260742.zip.sha512",
+    "format": ""
+   }
+  ]
+ }
+}

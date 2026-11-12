@@ -1,0 +1,109 @@
+@import "tailwindcss";
+
+/*
+ * Identidade visual de lenoborges.com.br (tokens extraídos em 11/11/2026).
+ * Tema escuro com relevo suave (neumorfismo) e acento azul.
+ * Cores de partidos NÃO ficam aqui: veja lib/party-colors.ts.
+ */
+@theme {
+  --color-ink: #1c1c1e;
+  --color-surface: #232326;
+  --color-raised: #2a2a2d;
+  --color-line: #383838;
+  --color-paper: #f2f3f5;
+  --color-muted: #a3a7ad;
+  --color-faint: #8e8e93;
+  --color-accent: #3986ff;
+  --color-accent-deep: #2563d9;
+  --color-accent-soft: #488fff;
+
+  /* Simulações hipotéticas: âmbar discreto, distinto do acento e dos partidos */
+  --color-sim: #d9a441;
+
+  --font-display: var(--font-outfit), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains-mono), ui-monospace, SFMono-Regular, monospace;
+
+  --radius-xl: 0.75rem;
+  --radius-2xl: 1rem;
+
+  --shadow-raised: 6px 6px 16px rgb(0 0 0 / 0.42), -4px -4px 12px rgb(255 255 255 / 0.025),
+    inset 0 1px 0 rgb(255 255 255 / 0.04);
+  --shadow-raised-lg: 10px 10px 28px rgb(0 0 0 / 0.5), -6px -6px 18px rgb(255 255 255 / 0.03),
+    inset 0 1px 0 rgb(255 255 255 / 0.05);
+  --shadow-inset: inset 3px 3px 7px rgb(0 0 0 / 0.5), inset -2px -2px 6px rgb(255 255 255 / 0.03);
+}
+
+html {
+  color-scheme: dark;
+  scroll-behavior: smooth;
+  scroll-padding-top: 5rem;
+}
+
+body {
+  background-color: var(--color-ink);
+  color: var(--color-muted);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  color: var(--color-paper);
+  letter-spacing: -0.025em;
+}
+
+::selection {
+  background: color-mix(in oklab, var(--color-accent) 40%, transparent);
+  color: var(--color-paper);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+  border-radius: 0.25rem;
+}
+
+@utility card {
+  background-color: var(--color-surface);
+  border-radius: var(--radius-2xl);
+  box-shadow: var(--shadow-raised);
+}
+
+@utility well {
+  background-color: var(--color-ink);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-inset);
+}
+
+/* Hachura usada em tudo que for simulação hipotética */
+@utility sim-hatch {
+  background-image: repeating-linear-gradient(
+    135deg,
+    color-mix(in oklab, var(--color-sim) 22%, transparent) 0 6px,
+    transparent 6px 12px
+  );
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/* Mapas por turno: as áreas trazem as cores dos dois turnos (ver Choropleth/MapaTurno) */
+.mapa-turno path {
+  fill: var(--f2);
+  fill-opacity: var(--o2);
+  transition: fill 0.2s, fill-opacity 0.2s;
+}
+.mapa-turno[data-turno="1"] path {
+  fill: var(--f1);
+  fill-opacity: var(--o1);
+}
+.mapa-turno a:hover path,
+.mapa-turno a:focus-visible path {
+  fill-opacity: 1;
+}
