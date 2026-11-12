@@ -167,7 +167,7 @@ export function LinhaDoTempo({
             {candidatos.map((c) =>
               c.numero in hover.p.valores ? (
                 <p key={c.numero} className="font-mono">
-                  {c.nome}: {hover.p.valores[c.numero].toFixed(1)}% ± {hover.p.margem[c.numero].toFixed(1)}
+                  {c.nome}: {hover.p.valores[c.numero].toFixed(1).replace(".", ",")}% ± {hover.p.margem[c.numero].toFixed(1).replace(".", ",")}
                 </p>
               ) : null,
             )}
