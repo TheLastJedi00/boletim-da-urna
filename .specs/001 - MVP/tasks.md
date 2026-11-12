@@ -93,10 +93,11 @@
 
 ## Fase 10 — `feat/publicacao`
 
-- [ ] **10.1** Metadados e SEO: título, descrição, imagem Open Graph com autoria, `sitemap` e `robots`.
-- [ ] **10.2** Revisão de acessibilidade (contraste, navegação por teclado, texto alternativo dos gráficos) e de responsividade em telas de celular.
-- [ ] **10.3** Revisão de performance: tamanho dos snapshots carregados por página e geração estática.
+- [x] **10.1** Metadados e SEO: título, descrição, imagem Open Graph com autoria, `sitemap` e `robots`.
+- [x] **10.2** Revisão de acessibilidade (contraste, navegação por teclado, texto alternativo dos gráficos) e de responsividade em telas de celular.
+- [x] **10.3** Revisão de performance: tamanho dos snapshots carregados por página e geração estática.
 - [ ] **10.4** Configurar o projeto na Vercel e o domínio `tse.lenoborges.com.br`. Requer acesso do autor à Vercel e ao DNS.
+  - **Pendente do autor:** importar o repositório na Vercel (framework Next.js, sem variáveis de ambiente) e adicionar o domínio `tse.lenoborges.com.br` (registro CNAME `tse` → `cname.vercel-dns.com` no DNS de lenoborges.com.br).
 
 ---
 
