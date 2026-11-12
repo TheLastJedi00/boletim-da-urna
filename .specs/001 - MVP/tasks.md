@@ -76,9 +76,9 @@
 
 ## Fase 7 — `feat/pagina-pesquisas`
 
-- [ ] **7.1** Linha do tempo das pesquisas por candidato, com a faixa de margem de erro e filtro por instituto.
-- [ ] **7.2** Notícias marcadas na linha do tempo.
-- [ ] **7.3** Projeção × resultado real, destacando quais pesquisas acertaram dentro da margem.
+- [x] **7.1** Linha do tempo das pesquisas por candidato, com a faixa de margem de erro e filtro por instituto.
+- [x] **7.2** Notícias marcadas na linha do tempo.
+- [x] **7.3** Projeção × resultado real, destacando quais pesquisas acertaram dentro da margem.
 
 ## Fase 8 — `feat/pagina-simulacoes`
 
