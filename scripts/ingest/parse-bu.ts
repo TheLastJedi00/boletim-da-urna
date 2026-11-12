@@ -139,7 +139,7 @@ export async function* parseBuCsv(stream: Readable): AsyncGenerator<BuRow> {
       dtEmissaoBu: date(get("DT_EMISSAO_BU")),
       dtBuRecebido: date(get("DT_BU_RECEBIDO")),
       eleitoresSemBiometria: int(get("QT_ELEI_BIOM_SEM_HABILITACAO")) ?? 0,
-      secoesAgregadas: agregadas ? agregadas.split(/[,\s]+/).filter(Boolean).map(Number) : [],
+      secoesAgregadas: agregadas ? agregadas.split(/\D+/).filter(Boolean).map(Number) : [],
     };
   }
 }

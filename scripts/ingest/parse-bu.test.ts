@@ -75,6 +75,14 @@ describe("parseBuCsv", () => {
     expect(r.tipoVotavel).toBe("Branco");
   });
 
+  it('lê várias seções agregadas separadas por "/" (formato do leia-me do TSE)', async () => {
+    const header = '"NR_TURNO";"DS_CARGO_PERGUNTA";"CD_CARGO_PERGUNTA";"DS_SECOES_AGREGADAS";"QT_VOTOS"';
+    const [r] = await collect(latin1(`${header}
+2;"Presidente";1;"10 / 114 / 117 / 126";1
+`));
+    expect(r.secoesAgregadas).toEqual([10, 114, 117, 126]);
+  });
+
   it("aceita campos com ponto e vírgula entre aspas e aspas escapadas", async () => {
     const header = '"NR_TURNO";"DS_CARGO_PERGUNTA";"CD_CARGO_PERGUNTA";"NM_VOTAVEL";"QT_VOTOS"';
     const line = '2;"Presidente";1;"NOME ""APELIDO""; JR";7';
