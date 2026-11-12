@@ -69,10 +69,10 @@
 
 ## Fase 6 — `feat/resultados`
 
-- [ ] **6.1** `/resultados`: resultado nacional do 1º e do 2º turno, com brancos, nulos, abstenção e comparecimento.
-- [ ] **6.2** Mapa por UF com as cores dos partidos de forma sutil, tooltip e link para a UF.
-- [ ] **6.3** `/resultados/[uf]`: detalhamento por município (mapa e tabela resumida), gerado de forma estática.
-- [ ] **6.4** Comparação 1º × 2º turno por UF: migração de votos e variação de abstenção.
+- [x] **6.1** `/resultados`: resultado nacional do 1º e do 2º turno, com brancos, nulos, abstenção e comparecimento.
+- [x] **6.2** Mapa por UF com as cores dos partidos de forma sutil, tooltip e link para a UF.
+- [x] **6.3** `/resultados/[uf]`: detalhamento por município (mapa e tabela resumida), gerado de forma estática.
+- [x] **6.4** Comparação 1º × 2º turno por UF: migração de votos e variação de abstenção.
 
 ## Fase 7 — `feat/pagina-pesquisas`
 
