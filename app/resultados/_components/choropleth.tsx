@@ -2,7 +2,7 @@ import Link from "next/link";
 import { geoMercator, geoPath } from "d3-geo";
 import type { Feature, FeatureCollection, Geometry } from "geojson";
 
-export type Area = { id: string; fill: string; opacity?: number; title: string; href?: string };
+export type Area = { fill: string; opacity?: number; title: string; href?: string };
 
 /**
  * Mapa coroplético renderizado no servidor (SVG estático, sem JS no cliente).

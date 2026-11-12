@@ -6,6 +6,8 @@ import { getResultados } from "@/lib/data/snapshots";
 import { nomeCandidato } from "@/lib/candidatos";
 import { formatPct } from "@/lib/format";
 import { vencedor } from "@/lib/results";
+import { getGeoUfs } from "@/lib/data/geo";
+import { MapaUfs } from "./_components/mapa-ufs";
 import { ResultadoNacional } from "./_components/resultado-nacional";
 
 export const metadata: Metadata = {
@@ -14,7 +16,7 @@ export const metadata: Metadata = {
 };
 
 export default async function Page() {
-  const { turnos } = await getResultados();
+  const [{ turnos }, geo] = await Promise.all([getResultados(), getGeoUfs()]);
   const v2 = vencedor(turnos["2"].br.totals, turnos["2"].br.candidatos);
 
   return (
@@ -29,8 +31,18 @@ export default async function Page() {
 
       <section className="mt-12" aria-label="Resultado nacional">
         <TurnoTabs
-          primeiro={<ResultadoNacional t={turnos["1"]} turno={1} />}
-          segundo={<ResultadoNacional t={turnos["2"]} turno={2} />}
+          primeiro={
+            <div className="space-y-6">
+              <ResultadoNacional t={turnos["1"]} turno={1} />
+              <MapaUfs geo={geo} t={turnos["1"]} turno={1} />
+            </div>
+          }
+          segundo={
+            <div className="space-y-6">
+              <ResultadoNacional t={turnos["2"]} turno={2} />
+              <MapaUfs geo={geo} t={turnos["2"]} turno={2} />
+            </div>
+          }
         />
       </section>
 
