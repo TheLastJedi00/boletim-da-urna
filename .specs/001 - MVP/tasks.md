@@ -52,13 +52,14 @@
 
 ## Fase 4 — `feat/pesquisas`: curadoria e modelo
 
-- [ ] **4.1** Testes do esquema e da validação dos CSVs de `data/curated/` (pesquisas e notícias): campos obrigatórios, nº de registro no TSE, tamanho da amostra > 0, margem coerente com a amostra, datas dentro da janela.
-- [ ] **4.2** Implementar o esquema e a validação.
-- [ ] **4.3** Coletar as pesquisas nacionais registradas no TSE (Datafolha, Quaest, AtlasIntel, Ipec, Paraná Pesquisas, PoderData e outros relevantes), de 16/08/2026 até a véspera de cada turno, com a URL de cada fonte.
-- [ ] **4.4** Coletar as notícias (Folha, G1, Estadão, O Globo, UOL, CNN Brasil, Poder360, BBC Brasil), no máximo ~3 por semana.
+- [x] **4.1** Testes do esquema e da validação dos CSVs de `data/curated/` (pesquisas e notícias): campos obrigatórios, nº de registro no TSE, tamanho da amostra > 0, margem coerente com a amostra, datas dentro da janela.
+- [x] **4.2** Implementar o esquema e a validação.
+- [x] **4.3** Coletar as pesquisas nacionais registradas no TSE (Datafolha, Quaest, AtlasIntel, Ipec, Paraná Pesquisas, PoderData e outros relevantes), de 16/08/2026 até a véspera de cada turno, com a URL de cada fonte.
+- [x] **4.4** Coletar as notícias (Folha, G1, Estadão, O Globo, UOL, CNN Brasil, Poder360, BBC Brasil), no máximo ~3 por semana.
 - [ ] **4.5** ⏸ **Checkpoint: aprovação do autor** para as listas de pesquisas e notícias antes de seguir.
-- [ ] **4.6** Testes do modelo de projeção: conversão para votos válidos; média ponderada por data e amostra; intervalo de incerteza; comparação com o resultado (acertou ou não dentro da margem).
-- [ ] **4.7** Implementar o modelo de projeção e gerar o snapshot de pesquisas.
+  - **Pendente.** O desenvolvimento seguiu com os dados marcados como "em revisão" (nada é publicado antes do merge). Fonte compilada: tabelas da Wikipédia, com o link original de cada pesquisa.
+- [x] **4.6** Testes do modelo de projeção: conversão para votos válidos; média ponderada por data e amostra; intervalo de incerteza; comparação com o resultado (acertou ou não dentro da margem).
+- [x] **4.7** Implementar o modelo de projeção e gerar o snapshot de pesquisas.
 
 ## Fase 5 — `feat/paginas-institucionais`
 
