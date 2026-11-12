@@ -40,15 +40,15 @@
 
 ## Fase 3 — `feat/sinais-simulacoes`: estatística e simulações
 
-- [ ] **3.1** Testes da distribuição de comparecimento: percentis, detecção robusta de outliers (mediana/MAD) e seções com comparecimento acima do número de aptos (o impossível).
-- [ ] **3.2** Implementar a distribuição de comparecimento.
-- [ ] **3.3** Testes dos sinais de horário e carga: abertura, encerramento e emissão fora do padrão; carga da urna fora da janela esperada.
-- [ ] **3.4** Implementar os sinais de horário e carga.
-- [ ] **3.5** Testes do sinal de liberações sem biometria, por seção e por região.
-- [ ] **3.6** Implementar o sinal de liberações sem biometria.
-- [ ] **3.7** Testes do motor de simulação. Cada cenário (encher urna, trocar votos na totalização, adulterar BU, urna com horário irregular, liberação em massa sem biometria) é aplicado sobre os dados reais e deve ser **detectado** pelo sinal correspondente. Os cenários são **simétricos entre candidatos**.
-- [ ] **3.8** Implementar o motor de simulação.
-- [ ] **3.9** Pré-calcular as estatísticas e os sinais nos snapshots (passo extra do `npm run ingest`).
+- [x] **3.1** Testes da distribuição de comparecimento: percentis, detecção robusta de outliers (mediana/MAD) e seções com comparecimento acima do número de aptos (o impossível).
+- [x] **3.2** Implementar a distribuição de comparecimento.
+- [x] **3.3** Testes dos sinais de horário e carga: abertura, encerramento e emissão fora do padrão; carga da urna fora da janela esperada.
+- [x] **3.4** Implementar os sinais de horário e carga.
+- [x] **3.5** Testes do sinal de liberações sem biometria, por seção e por região.
+- [x] **3.6** Implementar o sinal de liberações sem biometria.
+- [x] **3.7** Testes do motor de simulação. Cada cenário (encher urna, trocar votos na totalização, adulterar BU, urna com horário irregular, liberação em massa sem biometria) é aplicado sobre os dados reais e deve ser **detectado** pelo sinal correspondente. Os cenários são **simétricos entre candidatos**.
+- [x] **3.8** Implementar o motor de simulação.
+- [x] **3.9** Pré-calcular as estatísticas e os sinais nos snapshots (passo extra do `npm run ingest`).
 
 ## Fase 4 — `feat/pesquisas`: curadoria e modelo
 
