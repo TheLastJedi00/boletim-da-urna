@@ -59,9 +59,10 @@ export function Simulador({
   const lider = (t: typeof r.resultadoReal) =>
     [...candidatos].sort((a, b) => (t.votos[b.numero] ?? 0) - (t.votos[a.numero] ?? 0))[0].numero;
   const virou = lider(r.resultadoReal) !== lider(r.resultadoDivulgado);
-  // sinais que pegam ao menos 1/4 das seções alteradas (ou o total, quando não há seção-alvo)
+  // Com seções alteradas: sinais que pegam ao menos 1/4 delas. Sem seção alterada (fraude no total):
+  // só os controles globais — os outliers naturais da amostra não têm relação com a fraude simulada.
   const relevantes = r.deteccoes.filter((d) =>
-    r.alvos.length ? d.alvosDetectados / r.alvos.length >= 0.25 : d.detectado,
+    r.alvos.length ? d.alvosDetectados / r.alvos.length >= 0.25 : d.detectado && d.secoesApontadas === 0,
   );
 
   return (
