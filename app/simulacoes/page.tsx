@@ -5,6 +5,7 @@ import { TurnoTabs } from "@/app/_components/turno-tabs";
 import { getSinais } from "@/lib/data/snapshots";
 import { nomeCandidato } from "@/lib/candidatos";
 import { colorForParty } from "@/lib/party-colors";
+import { Benford } from "./_components/benford";
 import { SinaisReais } from "./_components/sinais-reais";
 import { Simulador } from "./_components/simulador";
 
@@ -51,6 +52,13 @@ export default async function Page() {
             cor: colorForParty(c.partido),
           }))}
         />
+      </section>
+
+      <section className="mt-20" aria-labelledby="benford">
+        <h2 id="benford" className="mb-6 text-3xl font-semibold">
+          E a Lei de Benford?
+        </h2>
+        <Benford amostra={turnos["2"].amostra} />
       </section>
 
       <NextSection current="/simulacoes" />
