@@ -2,3 +2,4 @@
 *.zip binary
 *.png binary
 *.ico binary
+scripts/ingest/__fixtures__/*.csv binary
