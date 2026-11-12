@@ -10,7 +10,7 @@ import { UFS } from "@/lib/ufs";
 import { Choropleth, type Area } from "./choropleth";
 
 /** Opacidade proporcional à margem: vitória apertada = cor mais clara. */
-export const opacidadeMargem = (margem: number) => 0.35 + Math.min(margem, 0.4) / 0.4 * 0.65;
+export const opacidadeMargem = (margem: number) => 0.5 + (Math.min(margem, 0.3) / 0.3) * 0.5;
 
 export function MapaUfs({ geo, t, turno }: { geo: Geo; t: TurnoResultado; turno: 1 | 2 }) {
   const areas = new Map<string, Area>();
