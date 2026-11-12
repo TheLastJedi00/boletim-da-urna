@@ -1,10 +1,11 @@
 /**
- * Ingestão de ponta a ponta:  npm run ingest [-- --uf AC,SP --turno 2 --out data/snapshots]
+ * Ingestão de ponta a ponta:  npm run ingest [-- --uf AC,SP --turno 2 --out data/snapshots --public public/data]
  *
  * 1. Catálogo CKAN → download dos zips de BU (SHA-512 verificado, cache em data/raw/)
  * 2. Parser em streaming → uma linha por seção (só Presidente)
  * 3. Agregados por município/UF + reconciliação com o JSON oficial do TSE
- * 4. Snapshots compactos + manifesto em --out
+ * 4. Agregados + manifesto em --out (lidos no build); seções por município em --public
+ *    como .json.gz (baixadas sob demanda e descomprimidas no navegador)
  * Idempotente: rodar de novo reaproveita o cache e regrava os mesmos arquivos.
  */
 import { join, relative } from "node:path";
@@ -24,7 +25,7 @@ import {
 } from "./official";
 import { openCsvFromZip, parseBuCsv } from "./parse-bu";
 import { groupSections } from "./sections";
-import { buildManifest, writeJson, type Fonte, type Output } from "./writer";
+import { buildManifest, writeJson, writeJsonGz, type Fonte, type Output } from "./writer";
 
 export const DIA_ELEICAO: Record<Turno, string> = { 1: "2026-10-04", 2: "2026-10-25" };
 
@@ -34,7 +35,7 @@ export type UfTurnoResult = {
   sections: SectionRecord[];
   totals: Totals;
   municipios: Map<string, Totals>;
-  reconciliacao: { ok: boolean; diffs: Diff[] };
+  reconciliacao: { ok: boolean; diffs: Diff[]; avisos: Diff[] };
 };
 
 /** Gancho para etapas extras (ex.: estatísticas da fase 3) que precisam ver todas as seções. */
@@ -47,6 +48,7 @@ export async function ingest(opts: {
   ufs?: string[];
   turnos?: Turno[];
   out: string;
+  publicDir: string;
   raw: string;
   hooks?: IngestHook[];
   log?: (msg: string) => void;
@@ -55,12 +57,14 @@ export async function ingest(opts: {
   const turnos = opts.turnos ?? [1, 2];
   const outputs: Output[] = [];
   const fontes: Fonte[] = [];
-  const write = async (rel: string, data: unknown) => {
-    const o = await writeJson(join(opts.out, rel), data);
-    const out = { ...o, path: relative(opts.out, o.path).replaceAll("\\", "/") };
+  const record = (o: Output, base: string, prefix: string) => {
+    const out = { ...o, path: prefix + relative(base, o.path).replaceAll("\\", "/") };
     outputs.push(out);
     return out;
   };
+  const write = async (rel: string, data: unknown) => record(await writeJson(join(opts.out, rel), data), opts.out, "");
+  const writePublicGz = async (rel: string, data: unknown) =>
+    record(await writeJsonGz(join(opts.publicDir, rel), data), opts.publicDir, "public:");
 
   log("Catálogo CKAN…");
   const catalog = (await fetchCatalog()).filter(
@@ -98,7 +102,8 @@ export async function ingest(opts: {
 
       const ofUf = await getOficial(t, uf);
       const rec = reconcile(r.totals, ofUf.totals);
-      log(`  ${uf} ${t}º turno: ${r.sections.length} seções — reconciliação ${rec.ok ? "OK" : `DIVERGE (${rec.diffs.length})`}`);
+      const aviso = rec.avisos.length ? ` (aviso: ${rec.avisos.map((a) => `${a.campo} ${a.calculado}/${a.oficial}`).join(", ")})` : "";
+      log(`  ${uf} ${t}º turno: ${r.sections.length} seções — reconciliação ${rec.ok ? "OK" : `DIVERGE (${rec.diffs.length})`}${aviso}`);
       resultados[t].ufs[uf] = { calculado: r.totals, oficial: ofUf.totals, reconciliacao: rec };
 
       // Seções, um arquivo por município (carregado sob demanda na página /secao).
@@ -109,7 +114,7 @@ export async function ingest(opts: {
         byMun.set(s.cdMunicipio, list);
       }
       for (const [mun, list] of byMun) {
-        await write(`secoes/${t}/${uf}/${mun}.json`, encodeSections(list, br.candidatos, DIA_ELEICAO[t]));
+        await writePublicGz(`secoes/${t}/${uf}/${mun}.json.gz`, encodeSections(list, br.candidatos, DIA_ELEICAO[t]));
       }
       (munTotals[uf] ??= {})[t] = Object.fromEntries(r.municipios);
 
@@ -142,7 +147,7 @@ export async function ingest(opts: {
   const manifest = buildManifest({ coletadoEm: new Date().toISOString(), fontes, saidas: outputs });
   await writeJson(join(opts.out, "manifest.json"), manifest);
   const divergentes = Object.values(resultados).flatMap((r) => Object.entries(r.ufs).filter(([, u]) => !u.reconciliacao.ok));
-  log(`Pronto: ${outputs.length} arquivos, ${(manifest.totalBytes / 1e6).toFixed(1)} MB em ${opts.out}`);
+  log(`Pronto: ${outputs.length} arquivos, ${(manifest.totalBytes / 1e6).toFixed(1)} MB (JSON) em ${opts.out} e ${opts.publicDir}`);
   if (divergentes.length) log(`ATENÇÃO: ${divergentes.length} UF(s) com divergência na reconciliação — veja resultados.json`);
   return { manifest, resultados };
 }
@@ -167,6 +172,7 @@ async function main() {
       uf: { type: "string" },
       turno: { type: "string" },
       out: { type: "string", default: "data/snapshots" },
+      public: { type: "string", default: "public/data" },
       raw: { type: "string", default: "data/raw" },
     },
   });
@@ -174,6 +180,7 @@ async function main() {
     ufs: values.uf?.toUpperCase().split(","),
     turnos: values.turno ? (values.turno.split(",").map(Number) as Turno[]) : undefined,
     out: values.out!,
+    publicDir: values.public!,
     raw: values.raw!,
     hooks: [],
   });

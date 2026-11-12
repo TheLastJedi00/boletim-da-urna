@@ -12,30 +12,31 @@
 
 ## Fase 1 — `feat/setup`: base do projeto
 
-- [ ] **1.1** Criar o app Next.js (App Router, TypeScript, Tailwind v4, ESLint) e configurar o `.gitignore` (incluindo `data/raw/`).
-- [ ] **1.2** Configurar o Vitest com os scripts `test` e `test:watch` e a estrutura de pastas: `scripts/` (ingestão), `lib/` (cálculos), `app/` (UI), `data/` (raw, curated, snapshots).
-- [ ] **1.3** Criar os tokens de identidade visual (cores, sombras, raios) no tema do Tailwind e carregar as fontes Outfit, DM Sans e JetBrains Mono via `next/font`.
-- [ ] **1.4** Criar o layout global: cabeçalho com navegação entre as seções, rodapé com autoria ("Estudo de caso feito por Leno Borges usando dados da Justiça Eleitoral" e link para lenoborges.com.br) e o componente "próxima seção".
-- [ ] **1.5** Criar as rotas vazias: `/`, `/sistema`, `/resultados`, `/resultados/[uf]`, `/pesquisas`, `/simulacoes`, `/secao` e `/metodologia`.
-- [ ] **1.6** Testes do mapa `party-colors`: todo partido tem cor; contraste ≥ 3:1 contra `#232326`; distância mínima em relação ao acento `#3986ff`.
-- [ ] **1.7** Implementar o `party-colors` (cores dos partidos dessaturadas e ajustadas ao tema escuro) e os tons de cinza para brancos, nulos e abstenção.
-- [ ] **1.8** Criar os componentes base de gráfico: escalas, eixos, legenda e tooltip em SVG com `d3-scale`/`d3-shape`, e o estilo "Simulação hipotética" (hachura e rótulo fixo).
+- [x] **1.1** Criar o app Next.js (App Router, TypeScript, Tailwind v4, ESLint) e configurar o `.gitignore` (incluindo `data/raw/`).
+- [x] **1.2** Configurar o Vitest com os scripts `test` e `test:watch` e a estrutura de pastas: `scripts/` (ingestão), `lib/` (cálculos), `app/` (UI), `data/` (raw, curated, snapshots).
+- [x] **1.3** Criar os tokens de identidade visual (cores, sombras, raios) no tema do Tailwind e carregar as fontes Outfit, DM Sans e JetBrains Mono via `next/font`.
+- [x] **1.4** Criar o layout global: cabeçalho com navegação entre as seções, rodapé com autoria ("Estudo de caso feito por Leno Borges usando dados da Justiça Eleitoral" e link para lenoborges.com.br) e o componente "próxima seção".
+- [x] **1.5** Criar as rotas vazias: `/`, `/sistema`, `/resultados`, `/resultados/[uf]`, `/pesquisas`, `/simulacoes`, `/secao` e `/metodologia`.
+- [x] **1.6** Testes do mapa `party-colors`: todo partido tem cor; contraste ≥ 3:1 contra `#232326`; distância mínima em relação ao acento `#3986ff`.
+- [x] **1.7** Implementar o `party-colors` (cores dos partidos dessaturadas e ajustadas ao tema escuro) e os tons de cinza para brancos, nulos e abstenção.
+- [x] **1.8** Criar os componentes base de gráfico: escalas, eixos, legenda e tooltip em SVG com `d3-scale`/`d3-shape`, e o estilo "Simulação hipotética" (hachura e rótulo fixo).
 
 ## Fase 2 — `feat/ingestao-tse`: dados oficiais
 
-- [ ] **2.1** Criar as fixtures de teste: um recorte real do CSV de BU do AC (1º e 2º turnos), um JSON de totalização e um JSON de municípios.
-- [ ] **2.2** Testes do download: monta a URL a partir do catálogo CKAN, verifica o SHA-512, rejeita arquivo corrompido e não baixa de novo o que já está em cache.
-- [ ] **2.3** Implementar o download: catálogo CKAN, CDN do TSE, verificação SHA-512 e cache em `data/raw/`.
-- [ ] **2.4** Testes do parser: lê em streaming, trata o encoding latin1, filtra só `Presidente` e converte os tipos (datas, números, `#NULO#`).
-- [ ] **2.5** Implementar o parser de CSV em streaming.
-- [ ] **2.6** Testes do normalizador por seção: uma linha por seção com aptos, comparecimento, abstenções, votos por candidato, brancos, nulos, horários (abertura, encerramento, emissão, recebimento, carga), tipo de urna, liberações sem biometria e seções agregadas.
-- [ ] **2.7** Implementar o normalizador por seção.
-- [ ] **2.8** Testes dos agregados por município, UF e Brasil, e da **reconciliação**: a soma dos BUs tem que bater com o total oficial do JSON do TSE.
-- [ ] **2.9** Implementar o cliente do JSON de resultados (totais nacional, por UF e por município; municípios com código IBGE), os agregados e a reconciliação.
-- [ ] **2.10** Testes do writer: snapshots compactos particionados por UF e turno, mais o manifesto (fonte, data de coleta, hash de origem).
-- [ ] **2.11** Implementar o writer e o comando `npm run ingest`, que roda tudo de ponta a ponta e é idempotente.
-- [ ] **2.12** Rodar a ingestão completa e **medir o tamanho dos snapshots**. Até ~50 MB, versionar em `public/data/`. Acima disso, publicar no Vercel Blob e registrar a decisão no PR.
-- [ ] **2.13** Gerar as malhas simplificadas de UF e município (IBGE) para os mapas.
+- [x] **2.1** Criar as fixtures de teste: um recorte real do CSV de BU do AC (1º e 2º turnos), um JSON de totalização e um JSON de municípios.
+- [x] **2.2** Testes do download: monta a URL a partir do catálogo CKAN, verifica o SHA-512, rejeita arquivo corrompido e não baixa de novo o que já está em cache.
+- [x] **2.3** Implementar o download: catálogo CKAN, CDN do TSE, verificação SHA-512 e cache em `data/raw/`.
+- [x] **2.4** Testes do parser: lê em streaming, trata o encoding latin1, filtra só `Presidente` e converte os tipos (datas, números, `#NULO#`).
+- [x] **2.5** Implementar o parser de CSV em streaming.
+- [x] **2.6** Testes do normalizador por seção: uma linha por seção com aptos, comparecimento, abstenções, votos por candidato, brancos, nulos, horários (abertura, encerramento, emissão, recebimento, carga), tipo de urna, liberações sem biometria e seções agregadas.
+- [x] **2.7** Implementar o normalizador por seção.
+- [x] **2.8** Testes dos agregados por município, UF e Brasil, e da **reconciliação**: a soma dos BUs tem que bater com o total oficial do JSON do TSE.
+- [x] **2.9** Implementar o cliente do JSON de resultados (totais nacional, por UF e por município; municípios com código IBGE), os agregados e a reconciliação.
+- [x] **2.10** Testes do writer: snapshots compactos particionados por UF e turno, mais o manifesto (fonte, data de coleta, hash de origem).
+- [x] **2.11** Implementar o writer e o comando `npm run ingest`, que roda tudo de ponta a ponta e é idempotente.
+- [x] **2.12** Rodar a ingestão completa e **medir o tamanho dos snapshots**. Até ~50 MB, versionar em `public/data/`. Acima disso, publicar no Vercel Blob e registrar a decisão no PR.
+  - **Resultado:** 125 MB em JSON, 33 MB com gzip. **Decisão:** as seções vão como `.json.gz` em `public/data/secoes/` e são descomprimidas no navegador (`DecompressionStream`); os agregados vão em `data/snapshots/`. Tudo versionado, sem Blob e sem credenciais.
+- [x] **2.13** Gerar as malhas simplificadas de UF e município (IBGE) para os mapas.
 
 ## Fase 3 — `feat/sinais-simulacoes`: estatística e simulações
 

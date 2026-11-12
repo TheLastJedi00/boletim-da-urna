@@ -48,10 +48,16 @@ export function aggregateBy(
 
 export type Diff = { campo: string; calculado: number; oficial: number };
 
-/** Compara a soma dos BUs com o total oficial, campo a campo. */
-export function reconcile(calculado: Totals, oficial: Totals): { ok: boolean; diffs: Diff[] } {
+/**
+ * Compara a soma dos BUs com o total oficial, campo a campo.
+ * Votos e comparecimento precisam bater; a contagem de seções só gera aviso, porque o total
+ * oficial inclui seções sem BU (não instaladas ou agregadas, comuns no exterior).
+ */
+export function reconcile(calculado: Totals, oficial: Totals): { ok: boolean; diffs: Diff[]; avisos: Diff[] } {
   const diffs: Diff[] = [];
-  const fields = ["secoes", "comparecimento", "brancos", "nulos", "nulosTecnicos"] as const;
+  const avisos: Diff[] =
+    calculado.secoes !== oficial.secoes ? [{ campo: "secoes", calculado: calculado.secoes, oficial: oficial.secoes }] : [];
+  const fields = ["comparecimento", "brancos", "nulos", "nulosTecnicos"] as const;
   for (const f of fields) {
     if (calculado[f] !== oficial[f]) diffs.push({ campo: f, calculado: calculado[f], oficial: oficial[f] });
   }
@@ -61,5 +67,5 @@ export function reconcile(calculado: Totals, oficial: Totals): { ok: boolean; di
     const o = oficial.votos[n] ?? 0;
     if (c !== o) diffs.push({ campo: `votos[${n}]`, calculado: c, oficial: o });
   }
-  return { ok: diffs.length === 0, diffs };
+  return { ok: diffs.length === 0, diffs, avisos };
 }
