@@ -3,7 +3,10 @@ import { NextSection } from "@/app/_components/next-section";
 import { PageHeader } from "@/app/_components/page-header";
 import { TurnoTabs } from "@/app/_components/turno-tabs";
 import { getSinais } from "@/lib/data/snapshots";
+import { nomeCandidato } from "@/lib/candidatos";
+import { colorForParty } from "@/lib/party-colors";
 import { SinaisReais } from "./_components/sinais-reais";
+import { Simulador } from "./_components/simulador";
 
 export const metadata: Metadata = {
   title: "Sinais de fraude: simulações hipotéticas",
@@ -29,6 +32,24 @@ export default async function Page() {
         <TurnoTabs
           primeiro={<SinaisReais s={turnos["1"]} turno={1} />}
           segundo={<SinaisReais s={turnos["2"]} turno={2} />}
+        />
+      </section>
+
+      <section className="mt-20" aria-labelledby="simulador">
+        <h2 id="simulador" className="text-3xl font-semibold">
+          Simule uma fraude hipotética
+        </h2>
+        <p className="mt-3 mb-8 max-w-3xl leading-relaxed">
+          Escolha um tipo de fraude e a intensidade. O simulador aplica a alteração a uma cópia dos dados e roda os
+          mesmos sinais usados acima. Os cenários funcionam igual para qualquer candidato.
+        </p>
+        <Simulador
+          amostra={turnos["2"].amostra}
+          candidatos={turnos["2"].amostra.candidatos.map((c) => ({
+            numero: c.numero,
+            nome: nomeCandidato(c.numero, c.nome),
+            cor: colorForParty(c.partido),
+          }))}
         />
       </section>
 

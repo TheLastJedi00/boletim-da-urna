@@ -21,7 +21,7 @@ export function Histogram({
 }) {
   const W = 640;
   const H = height;
-  const m = { top: 8, right: 8, bottom: 24, left: 8 };
+  const m = { top: 8, right: 20, bottom: 24, left: 16 };
   const x = scaleLinear().domain([bins[0].x0, bins[bins.length - 1].x1]).range([m.left, W - m.right]);
   const max = Math.max(...bins.map((b) => b.count), 1);
   // raiz quadrada: mantém visíveis as caudas pequenas sem esconder o pico
