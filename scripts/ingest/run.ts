@@ -25,6 +25,7 @@ import {
 } from "./official";
 import { openCsvFromZip, parseBuCsv } from "./parse-bu";
 import { groupSections } from "./sections";
+import { statsHook } from "./stats-hook";
 import { buildManifest, writeJson, writeJsonGz, type Fonte, type Output } from "./writer";
 
 export const DIA_ELEICAO: Record<Turno, string> = { 1: "2026-10-04", 2: "2026-10-25" };
@@ -36,6 +37,8 @@ export type UfTurnoResult = {
   totals: Totals;
   municipios: Map<string, Totals>;
   reconciliacao: { ok: boolean; diffs: Diff[]; avisos: Diff[] };
+  nomes?: Map<number, string>;
+  candidatos?: CandidatoOficial[];
 };
 
 /** Gancho para etapas extras (ex.: estatísticas da fase 3) que precisam ver todas as seções. */
@@ -118,7 +121,7 @@ export async function ingest(opts: {
       }
       (munTotals[uf] ??= {})[t] = Object.fromEntries(r.municipios);
 
-      for (const h of opts.hooks ?? []) await h.onUfTurno?.({ uf, turno: t, ...r, reconciliacao: rec });
+      for (const h of opts.hooks ?? []) await h.onUfTurno?.({ uf, turno: t, ...r, reconciliacao: rec, candidatos: br.candidatos });
     }
   }
 
@@ -163,6 +166,7 @@ async function processUfTurno(res: BuResource, turno: Turno, validos: CandidatoO
     sections: g.sections,
     totals: sumTotals(g.sections, validos),
     municipios: aggregateBy(g.sections, (s) => String(s.cdMunicipio), validos),
+    nomes: g.municipios,
   };
 }
 
@@ -182,7 +186,7 @@ async function main() {
     out: values.out!,
     publicDir: values.public!,
     raw: values.raw!,
-    hooks: [],
+    hooks: [statsHook()],
   });
 }
 
