@@ -37,5 +37,10 @@ export type Totals = {
   abstencoes: number;
   brancos: number;
   nulos: number;
+  /** votos em números sem candidatura válida (anulados pelo TSE) */
+  nulosTecnicos: number;
+  /** votos nominais válidos por número do candidato */
   votos: Record<number, number>;
 };
+
+export type CandidatoOficial = Candidato & { situacao: string };
