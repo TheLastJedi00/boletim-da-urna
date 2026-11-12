@@ -8,6 +8,7 @@ import { getPesquisas, getResultados, type PesquisasTurno } from "@/lib/data/sna
 import { formatDate } from "@/lib/format";
 import { colorForParty } from "@/lib/party-colors";
 import { LinhaDoTempo, type MarcoNoticia } from "./_components/linha-do-tempo";
+import { ProjecaoXResultado } from "./_components/projecao-x-resultado";
 
 export const metadata: Metadata = {
   title: "Pesquisas × urna",
@@ -30,6 +31,7 @@ export default async function Page() {
       .map((n, i) => ({ n: i + 1, data: n.data, titulo: n.titulo, turno: n.turno }))
       .filter((n) => n.turno === t && n.data <= resultados.turnos[t].dia);
     return (
+      <>
       <Figure
         title={`Intenção de voto em votos válidos — ${t}º turno`}
         description="Cada ponto é uma pesquisa (a barra vertical é a margem de erro). A linha é a média ponderada das pesquisas, com a faixa de incerteza. À direita, o resultado oficial."
@@ -53,6 +55,8 @@ export default async function Page() {
           diaEleicao={resultados.turnos[t].dia}
         />
       </Figure>
+      <ProjecaoXResultado tr={tr} turno={t} />
+      </>
     );
   };
 
