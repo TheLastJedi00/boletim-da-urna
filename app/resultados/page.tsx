@@ -7,6 +7,7 @@ import { nomeCandidato } from "@/lib/candidatos";
 import { formatPct } from "@/lib/format";
 import { vencedor } from "@/lib/results";
 import { getGeoUfs } from "@/lib/data/geo";
+import { ComparacaoTurnos } from "./_components/comparacao-turnos";
 import { MapaUfs } from "./_components/mapa-ufs";
 import { ResultadoNacional } from "./_components/resultado-nacional";
 
@@ -44,6 +45,10 @@ export default async function Page() {
             </div>
           }
         />
+      </section>
+
+      <section className="mt-12" aria-label="Comparação entre turnos">
+        <ComparacaoTurnos turnos={turnos} />
       </section>
 
       <NextSection current="/resultados" />
