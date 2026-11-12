@@ -63,9 +63,9 @@
 
 ## Fase 5 — `feat/paginas-institucionais`
 
-- [ ] **5.1** `/`: apresentação inicial com propósito, autoria, link para o portfólio, menção ao uso de IA e acesso às seções.
-- [ ] **5.2** `/sistema`: fluxo voto → BU → transmissão → totalização → divulgação, e os controles (zerésima, BU impresso, assinatura e hash, testes públicos, auditorias).
-- [ ] **5.3** `/metodologia`: fontes, manifesto de hashes, processamento, limitações e papel da IA.
+- [x] **5.1** `/`: apresentação inicial com propósito, autoria, link para o portfólio, menção ao uso de IA e acesso às seções.
+- [x] **5.2** `/sistema`: fluxo voto → BU → transmissão → totalização → divulgação, e os controles (zerésima, BU impresso, assinatura e hash, testes públicos, auditorias).
+- [x] **5.3** `/metodologia`: fontes, manifesto de hashes, processamento, limitações e papel da IA.
 
 ## Fase 6 — `feat/resultados`
 
