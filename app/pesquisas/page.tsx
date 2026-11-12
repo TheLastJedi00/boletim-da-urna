@@ -5,6 +5,7 @@ import { PageHeader } from "@/app/_components/page-header";
 import { TurnoTabs } from "@/app/_components/turno-tabs";
 import { nomeCandidato } from "@/lib/candidatos";
 import { getPesquisas, getResultados, type PesquisasTurno } from "@/lib/data/snapshots";
+import { formatDate } from "@/lib/format";
 import { colorForParty } from "@/lib/party-colors";
 import { LinhaDoTempo, type MarcoNoticia } from "./_components/linha-do-tempo";
 
@@ -27,7 +28,7 @@ export default async function Page() {
       });
     const marcos: MarcoNoticia[] = noticias
       .map((n, i) => ({ n: i + 1, data: n.data, titulo: n.titulo, turno: n.turno }))
-      .filter((n) => n.turno === t);
+      .filter((n) => n.turno === t && n.data <= resultados.turnos[t].dia);
     return (
       <Figure
         title={`Intenção de voto em votos válidos — ${t}º turno`}
@@ -66,6 +67,34 @@ export default async function Page() {
 
       <section className="mt-12" aria-label="Linha do tempo das pesquisas">
         <TurnoTabs primeiro={painel(1)} segundo={painel(2)} />
+      </section>
+
+      <section className="mt-12" aria-labelledby="noticias">
+        <h2 id="noticias" className="text-3xl font-semibold">
+          O que aconteceu na campanha
+        </h2>
+        <p className="mt-3 max-w-3xl leading-relaxed">
+          Os números no gráfico marcam fatos da campanha e do processo eleitoral. Eles ajudam a ler as pesquisas no
+          contexto — sem afirmar que um fato causou uma mudança.
+        </p>
+        <ol className="mt-6 grid gap-3 md:grid-cols-2">
+          {noticias.map((n, i) => (
+            <li key={n.url} className="card flex gap-4 p-4">
+              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-raised font-mono text-xs text-paper">
+                {i + 1}
+              </span>
+              <div>
+                <p className="text-xs text-faint">
+                  {formatDate(n.data)} · {n.veiculo}
+                </p>
+                <a href={n.url} className="mt-1 block font-medium text-paper hover:text-accent" rel="noopener noreferrer">
+                  {n.titulo}
+                </a>
+                <p className="mt-1 text-sm leading-relaxed">{n.resumo}</p>
+              </div>
+            </li>
+          ))}
+        </ol>
       </section>
 
       <NextSection current="/pesquisas" />
