@@ -11,7 +11,8 @@
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
     "ingest": "tsx scripts/ingest/run.ts",
-    "geo": "tsx scripts/geo/geo.ts"
+    "geo": "tsx scripts/geo/geo.ts",
+    "pesquisas": "tsx scripts/curated/build.ts"
   },
   "dependencies": {
     "d3-array": "^3.2.5",
