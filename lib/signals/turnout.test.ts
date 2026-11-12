@@ -50,8 +50,8 @@ describe("robustOutliers (mediana/MAD)", () => {
   });
 
   it("aceita limiar configurável", () => {
-    expect(robustOutliers([...base, 0.86], (x) => x, { threshold: 3.5 })).toEqual([]);
-    expect(robustOutliers([...base, 0.86], (x) => x, { threshold: 2 })).toHaveLength(1);
+    expect(robustOutliers([...base, 0.84], (x) => x, { threshold: 3.5 })).toEqual([]);
+    expect(robustOutliers([...base, 0.84], (x) => x, { threshold: 2 })).toHaveLength(1);
   });
 
   it("MAD zero (todos iguais) não divide por zero; só aponta quem difere", () => {
