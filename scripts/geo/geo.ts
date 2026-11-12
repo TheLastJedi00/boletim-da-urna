@@ -2,6 +2,7 @@
  * Malhas do IBGE (qualidade mínima) para os mapas: UFs do Brasil e municípios por UF.
  *   npm run geo   → public/geo/br-uf.json e public/geo/mun/<UF>.json
  */
+import { geoArea } from "d3-geo";
 import { join } from "node:path";
 import { writeJson } from "../ingest/writer";
 
@@ -34,13 +35,34 @@ function roundGeometry(g: Geometry, digits: number): Geometry {
   return g;
 }
 
+/**
+ * O d3-geo trabalha na esfera e espera o anel externo no sentido horário; a malha do IBGE segue a
+ * RFC 7946 (anti-horário). Se a área ficar maior que um hemisfério, inverte os anéis.
+ */
+function orientar(g: Geometry): Geometry {
+  const reverse = (rings: Pos[][]) => rings.map((r) => [...r].reverse());
+  if (g.type === "Polygon") {
+    const area = geoArea({ type: "Polygon", coordinates: g.coordinates } as never);
+    return area > 2 * Math.PI ? { type: g.type, coordinates: reverse(g.coordinates as Pos[][]) } : g;
+  }
+  if (g.type === "MultiPolygon") {
+    return {
+      type: g.type,
+      coordinates: (g.coordinates as Pos[][][]).map((p) =>
+        geoArea({ type: "Polygon", coordinates: p } as never) > 2 * Math.PI ? reverse(p) : p,
+      ),
+    };
+  }
+  return g;
+}
+
 export function normalizeCollection(fc: FC, id: (codarea: string) => string, digits = 3) {
   return {
     type: "FeatureCollection" as const,
     features: fc.features.map((f) => ({
       type: "Feature" as const,
       properties: { id: id(String(f.properties.codarea)) },
-      geometry: roundGeometry(f.geometry, digits) as { type: string; coordinates: Pos[][] },
+      geometry: orientar(roundGeometry(f.geometry, digits)) as { type: string; coordinates: Pos[][] },
     })),
   };
 }

@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { geoArea } from "d3-geo";
 import { IBGE_UF, normalizeCollection, roundCoords } from "./geo";
 
 describe("geo", () => {
@@ -32,5 +33,13 @@ describe("geo", () => {
     const out = normalizeCollection(fc, (c) => IBGE_UF[c]);
     expect(out.features[0].properties).toEqual({ id: "AC" });
     expect(out.features[0].geometry.coordinates[0][0]).toEqual([0.123, 1.988]);
+  });
+
+  it("orienta os anéis no padrão do d3-geo (polígono pequeno, não o 'mundo menos o polígono')", () => {
+    // anel anti-horário (padrão RFC 7946, como vem do IBGE): o d3 interpretaria como o complemento
+    const ccw = [[-50, -10], [-49, -10], [-49, -9], [-50, -9], [-50, -10]];
+    const fc = { type: "FeatureCollection", features: [{ type: "Feature", properties: { codarea: "12" }, geometry: { type: "Polygon", coordinates: [ccw] } }] };
+    const out = normalizeCollection(fc, (c) => IBGE_UF[c]);
+    expect(geoArea(out.features[0] as never)).toBeLessThan(0.01);
   });
 });
