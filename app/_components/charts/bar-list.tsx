@@ -18,7 +18,7 @@ export function BarList({ data, total, showVotes = true }: { data: BarDatum[]; t
               {d.label}
               {d.note && <span className="ml-2 text-xs text-faint">{d.note}</span>}
             </span>
-            <span className="font-mono tabular-nums text-paper">
+            <span className="shrink-0 whitespace-nowrap font-mono tabular-nums text-paper">
               {formatPct(d.value / base)}
               {showVotes && <span className="ml-2 text-xs text-faint">{formatInt(d.value)}</span>}
             </span>

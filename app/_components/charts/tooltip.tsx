@@ -1,7 +1,7 @@
 "use client";
 
 /** Tooltip posicionado sobre um gráfico; o pai controla `x`, `y` e o conteúdo. */
-export function Tooltip({ x, y, children }: { x: number; y: number; children: React.ReactNode }) {
+export function Tooltip({ x, y, children }: { x: number | string; y: number | string; children: React.ReactNode }) {
   return (
     <div
       role="status"
