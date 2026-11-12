@@ -103,6 +103,7 @@
 
 ## Encerramento
 
-- [ ] Mergear todas as `feat/*` em `release/001-mvp`.
-- [ ] Subir a app em `localhost:3000` e testar no Chrome todas as rotas e interações (mapa, filtros, simulador, busca de seção).
+- [x] Mergear todas as `feat/*` em `release/001-mvp`.
+- [x] Subir a app em `localhost:3000` e testar no Chrome todas as rotas e interações (mapa, filtros, simulador, busca de seção).
 - [ ] Abrir o PR de `release/001-mvp` contra `main`, com as **decisões tomadas no topo**.
+  - Descrição pronta em [pr.md](./pr.md); falta um remoto no GitHub.
