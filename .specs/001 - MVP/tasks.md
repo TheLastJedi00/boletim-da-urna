@@ -88,8 +88,8 @@
 
 ## Fase 9 — `feat/pagina-secao`
 
-- [ ] **9.1** Busca encadeada UF → município → zona → seção, carregando só o snapshot da UF escolhida.
-- [ ] **9.2** BU da seção: votos, aptos, comparecimento, horários, hash e links para os arquivos oficiais assinados no TSE.
+- [x] **9.1** Busca encadeada UF → município → zona → seção, carregando só o snapshot da UF escolhida.
+- [x] **9.2** BU da seção: votos, aptos, comparecimento, horários, hash e links para os arquivos oficiais assinados no TSE.
 
 ## Fase 10 — `feat/publicacao`
 
