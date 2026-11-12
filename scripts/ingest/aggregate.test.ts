@@ -63,6 +63,14 @@ describe("reconcile — soma dos BUs × total oficial", () => {
     expect(r.diffs).toContainEqual({ campo: "votos[13]", calculado: o.totals.votos[13] + 5, oficial: o.totals.votos[13] });
   });
 
+  it("diferença só na contagem de seções vira aviso, não divergência (seções sem BU no exterior)", () => {
+    const base = { secoes: 10, aptos: 0, comparecimento: 5, abstencoes: 0, brancos: 0, nulos: 0, nulosTecnicos: 0, votos: { 13: 5 } };
+    const r = reconcile(base, { ...base, secoes: 12 });
+    expect(r.ok).toBe(true);
+    expect(r.diffs).toEqual([]);
+    expect(r.avisos).toEqual([{ campo: "secoes", calculado: 10, oficial: 12 }]);
+  });
+
   it("votos em número que não é candidatura válida contam como nulos técnicos", () => {
     const sec = { votos: { 13: 10, 28: 3 }, brancos: 1, nulos: 2 } as unknown as SectionRecord;
     const t = sumTotals([{ ...sec, aptos: 20, comparecimento: 16, abstencoes: 4 }], [

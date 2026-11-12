@@ -7,7 +7,8 @@ import { describe, expect, it } from "vitest";
 import { decodeSections, encodeSections } from "../../lib/section-codec";
 import { parseBuCsv } from "./parse-bu";
 import { groupSections } from "./sections";
-import { buildManifest, writeJson } from "./writer";
+import { gunzipSync } from "node:zlib";
+import { buildManifest, writeJson, writeJsonGz } from "./writer";
 
 const FX = join(__dirname, "__fixtures__");
 const load = async (f: string) => groupSections(parseBuCsv(createReadStream(join(FX, f))));
@@ -57,6 +58,19 @@ describe("writeJson", () => {
     const a = await writeJson(join(dir, "1.json"), { b: 2, a: 1 });
     const b = await writeJson(join(dir, "2.json"), { b: 2, a: 1 });
     expect(a.sha256).toBe(b.sha256);
+  });
+});
+
+describe("writeJsonGz", () => {
+  it("grava gzip determinístico; sha256 e bytes referem-se ao JSON descomprimido", async () => {
+    const dir = await mkdtemp(join(tmpdir(), "bu-w-"));
+    const a = await writeJsonGz(join(dir, "a.json.gz"), { x: [1, 2, 3] });
+    const b = await writeJsonGz(join(dir, "b.json.gz"), { x: [1, 2, 3] });
+    const raw = gunzipSync(await readFile(a.path)).toString("utf8");
+    expect(raw).toBe('{"x":[1,2,3]}');
+    expect(a.sha256).toBe(createHash("sha256").update(raw).digest("hex"));
+    expect(await readFile(a.path)).toEqual(await readFile(b.path));
+    expect(a.gzBytes).toBeGreaterThan(0);
   });
 });
 

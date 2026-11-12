@@ -42,7 +42,3 @@ next-env.d.ts
 
 # dados brutos do TSE (CSV/zip gigantes) — nunca versionar
 /data/raw/
-
-# snapshots gerados pela ingestão (destino decidido na tarefa 2.12)
-/data/snapshots/*
-!/data/snapshots/.gitkeep
