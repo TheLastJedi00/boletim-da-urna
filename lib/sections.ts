@@ -21,3 +21,5 @@ export const AUTHOR = {
   portfolio: "https://lenoborges.com.br",
   credit: "Estudo de caso feito por Leno Borges usando dados da Justiça Eleitoral",
 } as const;
+
+export const SITE_URL = "https://tse.lenoborges.com.br";
