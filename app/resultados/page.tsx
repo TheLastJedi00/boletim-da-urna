@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { NextSection } from "@/app/_components/next-section";
 import { PageHeader } from "@/app/_components/page-header";
-import { TurnoTabs } from "@/app/_components/turno-tabs";
+import { PorTurno, TurnoProvider, TurnoSeletor } from "@/app/_components/turno-context";
 import { getResultados } from "@/lib/data/snapshots";
 import { nomeCandidato } from "@/lib/candidatos";
 import { formatPct } from "@/lib/format";
@@ -31,20 +31,18 @@ export default async function Page() {
       </PageHeader>
 
       <section className="mt-12" aria-label="Resultado nacional">
-        <TurnoTabs
-          primeiro={
-            <div className="space-y-6">
+        <TurnoProvider>
+          <TurnoSeletor />
+          <div className="mt-6 space-y-6">
+            <PorTurno turno={1}>
               <ResultadoNacional t={turnos["1"]} turno={1} />
-              <MapaUfs geo={geo} t={turnos["1"]} turno={1} />
-            </div>
-          }
-          segundo={
-            <div className="space-y-6">
+            </PorTurno>
+            <PorTurno turno={2}>
               <ResultadoNacional t={turnos["2"]} turno={2} />
-              <MapaUfs geo={geo} t={turnos["2"]} turno={2} />
-            </div>
-          }
-        />
+            </PorTurno>
+            <MapaUfs geo={geo} turnos={turnos} />
+          </div>
+        </TurnoProvider>
       </section>
 
       <section className="mt-12" aria-label="Comparação entre turnos">

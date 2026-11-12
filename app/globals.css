@@ -92,3 +92,18 @@ h3 {
     scroll-behavior: auto;
   }
 }
+
+/* Mapas por turno: as áreas trazem as cores dos dois turnos (ver Choropleth/MapaTurno) */
+.mapa-turno path {
+  fill: var(--f2);
+  fill-opacity: var(--o2);
+  transition: fill 0.2s, fill-opacity 0.2s;
+}
+.mapa-turno[data-turno="1"] path {
+  fill: var(--f1);
+  fill-opacity: var(--o1);
+}
+.mapa-turno a:hover path,
+.mapa-turno a:focus-visible path {
+  fill-opacity: 1;
+}

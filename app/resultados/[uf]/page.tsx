@@ -5,7 +5,7 @@ import { BarList } from "@/app/_components/charts/bar-list";
 import { Figure } from "@/app/_components/charts/figure";
 import { Legend } from "@/app/_components/charts/legend";
 import { PageHeader } from "@/app/_components/page-header";
-import { TurnoTabs } from "@/app/_components/turno-tabs";
+import { MapaTurno, PorTurno, TurnoProvider, TurnoSeletor } from "@/app/_components/turno-context";
 import { nomeCandidato } from "@/lib/candidatos";
 import type { CandidatoOficial } from "@/lib/data-types";
 import { getGeoMunicipios } from "@/lib/data/geo";
@@ -39,51 +39,31 @@ export default async function Page({ params }: PageProps<"/resultados/[uf]">) {
     exterior ? Promise.resolve(null) : getGeoMunicipios(sigla),
   ]);
 
-  const painel = (t: 1 | 2) => {
+  const resumo = (t: 1 | 2) => {
     const tr = turnos[t];
     const uf = tr.ufs[sigla];
-    const cands = tr.br.candidatos;
-    const r = ranking(uf.calculado, cands).filter((c) => c.validos >= 0.01);
+    const r = ranking(uf.calculado, tr.br.candidatos).filter((c) => c.validos >= 0.01);
     return (
-      <div className="space-y-6">
-        <div className="grid gap-6 lg:grid-cols-[1fr_1.3fr]">
-          <Figure title={`Votos válidos em ${info.nome}`} source="Soma dos boletins de urna (TSE), idêntica ao total oficial da UF.">
-            <BarList
-              data={r.map((c) => ({ key: String(c.numero), label: nomeCandidato(c.numero, c.nome), note: c.partido, value: c.votos, color: colorForParty(c.partido) }))}
-              total={Object.values(uf.calculado.votos).reduce((a, b) => a + b, 0)}
-            />
-            <p className="mt-4 text-sm">
-              {formatInt(uf.calculado.secoes)} seções · comparecimento {formatPct(uf.calculado.comparecimento / uf.calculado.aptos)}
-            </p>
-          </Figure>
-          {geo ? (
-            <Figure
-              title="Vencedor por município"
-              description="Cor do mais votado; quanto mais forte, maior a vantagem."
-              source="Soma dos boletins de urna por município (TSE). Malha: IBGE."
-            >
-              <Legend
-                items={[...new Map(municipios.flatMap((m) => (m.turnos[t] ? [vencedor(m.turnos[t]!, cands).primeiro] : [])).map((c) => [c.numero, c])).values()].map(
-                  (c) => ({ label: nomeCandidato(c.numero), color: colorForParty(c.partido) }),
-                )}
-              />
-              <div className="mt-4">
-                <Choropleth geo={geo} areas={areasMunicipios(municipios, t, cands)} label={`Mapa de ${info.nome}: vencedor por município no ${t}º turno`} />
-              </div>
-            </Figure>
-          ) : (
-            <Figure title="Votos no exterior" source="TSE.">
-              <p className="text-sm leading-relaxed">
-                Brasileiros que vivem fora votam em seções instaladas em embaixadas e consulados. A lista abaixo mostra
-                as cidades com seções.
-              </p>
-            </Figure>
-          )}
-        </div>
-        <TabelaMunicipios municipios={municipios} turno={t} cands={cands} exterior={exterior} />
-      </div>
+      <Figure title={`Votos válidos em ${info.nome} — ${t}º turno`} source="Soma dos boletins de urna (TSE), idêntica ao total oficial da UF.">
+        <BarList
+          data={r.map((c) => ({ key: String(c.numero), label: nomeCandidato(c.numero, c.nome), note: c.partido, value: c.votos, color: colorForParty(c.partido) }))}
+          total={Object.values(uf.calculado.votos).reduce((a, b) => a + b, 0)}
+        />
+        <p className="mt-4 text-sm">
+          {formatInt(uf.calculado.secoes)} seções · comparecimento {formatPct(uf.calculado.comparecimento / uf.calculado.aptos)}
+        </p>
+      </Figure>
     );
   };
+
+  const legenda = new Map<number, string>();
+  for (const t of [1, 2] as const) {
+    for (const m of municipios) {
+      if (!m.turnos[t]) continue;
+      const v = vencedor(m.turnos[t]!, turnos[t].br.candidatos).primeiro;
+      legenda.set(v.numero, v.partido);
+    }
+  }
 
   return (
     <>
@@ -94,7 +74,43 @@ export default async function Page({ params }: PageProps<"/resultados/[uf]">) {
         <PageHeader eyebrow="Resultados por UF" title={info.nome} />
       </div>
       <section className="mt-10">
-        <TurnoTabs primeiro={painel(1)} segundo={painel(2)} />
+        <TurnoProvider>
+          <TurnoSeletor />
+          <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_1.3fr]">
+            <div>
+              <PorTurno turno={1}>{resumo(1)}</PorTurno>
+              <PorTurno turno={2}>{resumo(2)}</PorTurno>
+            </div>
+            {geo ? (
+              <Figure
+                title="Vencedor por município"
+                description="Cor do mais votado; quanto mais forte, maior a vantagem."
+                source="Soma dos boletins de urna por município (TSE). Malha: IBGE."
+              >
+                <Legend items={[...legenda].map(([n, p]) => ({ label: nomeCandidato(n), color: colorForParty(p) }))} />
+                <div className="mt-4">
+                  <MapaTurno>
+                    <Choropleth
+                      geo={geo}
+                      turnos={[areasMunicipios(municipios, 1, turnos["1"].br.candidatos), areasMunicipios(municipios, 2, turnos["2"].br.candidatos)]}
+                      label={`Mapa de ${info.nome}: vencedor por município`}
+                    />
+                  </MapaTurno>
+                </div>
+              </Figure>
+            ) : (
+              <Figure title="Votos no exterior" source="TSE.">
+                <p className="text-sm leading-relaxed">
+                  Brasileiros que vivem fora votam em seções instaladas em embaixadas e consulados. A lista abaixo mostra
+                  as cidades com seções.
+                </p>
+              </Figure>
+            )}
+          </div>
+          <div className="mt-6">
+            <TabelaMunicipios municipios={municipios} cands={[turnos["1"].br.candidatos, turnos["2"].br.candidatos]} exterior={exterior} />
+          </div>
+        </TurnoProvider>
       </section>
     </>
   );
@@ -115,11 +131,25 @@ function areasMunicipios(municipios: MunicipioSnapshot[], t: 1 | 2, cands: Candi
   return areas;
 }
 
-function TabelaMunicipios({ municipios, turno, cands, exterior }: { municipios: MunicipioSnapshot[]; turno: 1 | 2; cands: CandidatoOficial[]; exterior: boolean }) {
+/** Uma tabela só, com o mais votado nos dois turnos (renderizada uma vez, fora das abas). */
+function TabelaMunicipios({ municipios, cands, exterior }: { municipios: MunicipioSnapshot[]; cands: [CandidatoOficial[], CandidatoOficial[]]; exterior: boolean }) {
   const linhas = municipios
-    .filter((m) => m.turnos[turno])
-    .map((m) => ({ m, t: m.turnos[turno]!, v: vencedor(m.turnos[turno]!, cands) }))
-    .sort((a, b) => b.t.aptos - a.t.aptos);
+    .filter((m) => m.turnos["1"] || m.turnos["2"])
+    .map((m) => ({
+      m,
+      aptos: (m.turnos["2"] ?? m.turnos["1"])!.aptos,
+      v: ([1, 2] as const).map((t) => (m.turnos[t] ? vencedor(m.turnos[t]!, cands[t - 1]).primeiro : null)),
+    }))
+    .sort((a, b) => b.aptos - a.aptos);
+  const celula = (c: (typeof linhas)[number]["v"][number]) =>
+    c ? (
+      <>
+        <span className="mr-1.5 inline-block h-2 w-2 rounded-full" style={{ backgroundColor: colorForParty(c.partido) }} aria-hidden />
+        {nomeCandidato(c.numero)} <span className="font-mono text-faint">{formatPct1(c.validos)}</span>
+      </>
+    ) : (
+      "—"
+    );
   const tabela = (rows: typeof linhas) => (
     <div className="overflow-x-auto">
       <table className="w-full min-w-[36rem] text-sm">
@@ -127,20 +157,17 @@ function TabelaMunicipios({ municipios, turno, cands, exterior }: { municipios: 
           <tr className="text-left text-xs uppercase tracking-wider text-faint">
             <th className="px-3 py-2">{exterior ? "Cidade" : "Município"}</th>
             <th className="px-3 py-2 text-right">Aptos</th>
-            <th className="px-3 py-2 text-right">Comparecimento</th>
-            <th className="px-3 py-2">Mais votado</th>
+            <th className="px-3 py-2">Mais votado · 1º turno</th>
+            <th className="px-3 py-2">Mais votado · 2º turno</th>
           </tr>
         </thead>
         <tbody>
-          {rows.map(({ m, t, v }) => (
+          {rows.map(({ m, aptos, v }) => (
             <tr key={m.codigo} className="border-t border-line/60">
-              <td className="px-3 py-2 text-paper">{m.nome}</td>
-              <td className="px-3 py-2 text-right font-mono tabular-nums">{formatInt(t.aptos)}</td>
-              <td className="px-3 py-2 text-right font-mono tabular-nums">{formatPct1(t.comparecimento / t.aptos)}</td>
-              <td className="px-3 py-2">
-                <span className="mr-2 inline-block h-2.5 w-2.5 rounded-full" style={{ backgroundColor: colorForParty(v.primeiro.partido) }} aria-hidden />
-                {nomeCandidato(v.primeiro.numero)} <span className="font-mono text-faint">{formatPct1(v.primeiro.validos)}</span>
-              </td>
+              <td className="px-3 py-1.5 text-paper">{m.nome}</td>
+              <td className="px-3 py-1.5 text-right font-mono tabular-nums">{formatInt(aptos)}</td>
+              <td className="px-3 py-1.5">{celula(v[0])}</td>
+              <td className="px-3 py-1.5">{celula(v[1])}</td>
             </tr>
           ))}
         </tbody>
@@ -148,7 +175,7 @@ function TabelaMunicipios({ municipios, turno, cands, exterior }: { municipios: 
     </div>
   );
   return (
-    <Figure title={`Maiores ${exterior ? "cidades" : "municípios"} por eleitorado`} source="Soma dos boletins de urna (TSE).">
+    <Figure title={`${exterior ? "Cidades" : "Municípios"} por eleitorado`} source="Soma dos boletins de urna (TSE). Percentual de votos válidos do mais votado.">
       {tabela(linhas.slice(0, 10))}
       {linhas.length > 10 && (
         <details className="mt-4">
