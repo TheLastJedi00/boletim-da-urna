@@ -42,3 +42,16 @@ next-env.d.ts
 
 # dados brutos do TSE (CSV/zip gigantes) — nunca versionar
 /data/raw/
+*.zip
+*.sha512
+
+# build / caches locais
+/dist
+/.turbo
+/.cache
+*.log
+
+# editores e SO
+.vscode/
+.idea/
+Thumbs.db
